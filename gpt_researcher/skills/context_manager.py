@@ -21,13 +21,15 @@ class ContextManager:
             )
 
         context_compressor = ContextCompressor(
-            documents=pages, embeddings=self.researcher.memory.get_embeddings()
+            documents=pages,
+            embeddings=self.researcher.memory.get_embeddings(),
+            prompt_family=self.researcher.prompt_family,
         )
         return await context_compressor.async_get_context(
             query=query, max_results=10, cost_callback=self.researcher.add_costs
         )
-        
-    async def get_similar_content_by_query_with_vectorstore(self, query, filter): 
+
+    async def get_similar_content_by_query_with_vectorstore(self, query, filter):
         if self.researcher.verbose:
             await stream_output(
                 "logs",
@@ -35,9 +37,11 @@ class ContextManager:
                 f" Getting relevant content based on query: {query}...",
                 self.researcher.websocket,
                 )
-        vectorstore_compressor = VectorstoreCompressor(self.researcher.vector_store, filter)
+        vectorstore_compressor = VectorstoreCompressor(
+            self.researcher.vector_store, filter, prompt_family=self.researcher.prompt_family,
+        )
         return await vectorstore_compressor.async_get_context(query=query, max_results=8)
-    
+
     async def get_similar_written_contents_by_draft_section_titles(
         self,
         current_subtopic: str,
@@ -53,12 +57,6 @@ class ContextManager:
         results = await asyncio.gather(*[process_query(query) for query in all_queries])
         relevant_contents = set().union(*results)
         relevant_contents = list(relevant_contents)[:max_results]
-
-        if relevant_contents and self.researcher.verbose:
-            prettier_contents = "\n".join(relevant_contents)
-            await stream_output(
-                "logs", "relevant_contents_context", f"📃 {prettier_contents}", self.researcher.websocket
-            )
 
         return relevant_contents
 

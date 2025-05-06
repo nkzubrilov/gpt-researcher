@@ -4,12 +4,7 @@ import Report from '../Task/Report';
 import AgentLogs from '../Task/AgentLogs';
 import AccessReport from '../ResearchBlocks/AccessReport';
 import { getHost } from '../../helpers/getHost';
-
-interface ChatBoxSettings {
-  report_source: string;
-  report_type: string;
-  tone: string;
-}
+import { ChatBoxSettings } from '@/types/data';
 
 interface ChatBoxProps {
   chatBoxSettings: ChatBoxSettings;
@@ -36,10 +31,10 @@ export default function ChatBox({ chatBoxSettings, setChatBoxSettings }: ChatBox
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const fullHost = getHost()
-      const host = fullHost.replace('http://', '').replace('https://', '')
-      
-      const ws_uri = `${fullHost.includes('https') ? 'wss:' : 'ws:'}//${host}/ws`;
+      let fullHost = getHost()
+      const protocol = fullHost.includes('https') ? 'wss:' : 'ws:'
+      const cleanHost = fullHost.replace('http://', '').replace('https://', '')
+      const ws_uri = `${protocol}//${cleanHost}/ws`
       const newSocket = new WebSocket(ws_uri);
       setSocket(newSocket);
 
@@ -68,7 +63,7 @@ export default function ChatBox({ chatBoxSettings, setChatBoxSettings }: ChatBox
 
   return (
     <div>
-      <main className="container" id="form">
+      <main className="static-container" id="form">
         <ResearchForm 
           chatBoxSettings={chatBoxSettings} 
           setChatBoxSettings={setChatBoxSettings}

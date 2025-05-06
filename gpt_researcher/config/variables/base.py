@@ -15,7 +15,6 @@ class BaseConfig(TypedDict):
     BROWSE_CHUNK_MAX_LENGTH: int
     SUMMARY_TOKEN_LIMIT: int
     TEMPERATURE: float
-    LLM_TEMPERATURE: float
     USER_AGENT: str
     MAX_SEARCH_RESULTS_PER_QUERY: int
     MEMORY_BACKEND: str
@@ -26,6 +25,13 @@ class BaseConfig(TypedDict):
     LANGUAGE: str
     AGENT_ROLE: Union[str, None]
     SCRAPER: str
+    MAX_SCRAPER_WORKERS: int
     MAX_SUBTOPICS: int
     REPORT_SOURCE: Union[str, None]
     DOC_PATH: str
+    PROMPT_FAMILY: str
+    LLM_KWARGS: dict
+    EMBEDDING_KWARGS: dict
+    DEEP_RESEARCH_CONCURRENCY: int
+    DEEP_RESEARCH_DEPTH: int
+    DEEP_RESEARCH_BREADTH: int
