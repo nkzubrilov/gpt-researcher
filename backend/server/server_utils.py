@@ -103,16 +103,19 @@ def sanitize_filename(filename: str) -> str:
     prefix, timestamp, *task_parts = filename.split('_')
     task = '_'.join(task_parts)
     
-    # Calculate max length for task portion
-    # 255 - len("outputs/") - len("task_") - len(timestamp) - len("_.json") - safety_margin
-    max_task_length = 255 - 8 - 5 - 10 - 6 - 10  # ~216 chars for task
+    # Calculate max length for task portion (much shorter to be safe)
+    # Windows path limit is 260, we'll keep the task portion very short
+    max_task_length = 50  # Significantly reduced from 216
     
     # Truncate task if needed
     truncated_task = task[:max_task_length] if len(task) > max_task_length else task
     
     # Reassemble and clean the filename
     sanitized = f"{prefix}_{timestamp}_{truncated_task}"
-    return re.sub(r"[^\w\s-]", "", sanitized).strip()
+    # Remove non-ASCII characters and other problematic characters
+    sanitized = re.sub(r'[^\x00-\x7F]+', '', sanitized)  # Remove non-ASCII
+    sanitized = re.sub(r"[^\w\s-]", "", sanitized).strip()
+    return sanitized
 
 
 async def handle_start_command(websocket, data: str, manager):
